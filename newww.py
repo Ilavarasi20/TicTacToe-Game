@@ -1,4 +1,3 @@
-
 import random
 import streamlit as st
 
@@ -51,30 +50,63 @@ st.markdown("""
 }
 
 /* -------------------- Game Board -------------------- */
-div[data-testid="stButton"] button {
-    min-height: 100px;
-    border-radius: 18px;
-    border: 2px solid #d5b4f5;
+
+/* Keep board columns in a single row */
+.st-key-gameboard [data-testid="stHorizontalBlock"] {
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+}
+
+/* Equal width for all 3 columns */
+.st-key-gameboard [data-testid="column"] {
+    min-width: 0 !important;
+    flex: 1 1 0% !important;
+    width: 33.33% !important;
+}
+
+/* Square XO boxes */
+.st-key-gameboard div[data-testid="stButton"] button {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    min-height: 0 !important;
+    height: auto !important;
+
+    padding: 0 !important;
+
+    border-radius: 18px !important;
+    border: 2px solid #d5b4f5 !important;
 
     background: linear-gradient(
         145deg,
         #fffaff,
         #f5eaff
-    );
+    ) !important;
 
-    color: #6515a9;
+    color: #6515a9 !important;
 
-    font-size: 3.2rem !important;
+    font-size: clamp(2rem, 7vw, 3.2rem) !important;
     font-weight: 900 !important;
 
     box-shadow: 0 6px 14px
         rgba(118, 84, 169, 0.14);
 
-    transition:
-        transform .12s ease,
-        box-shadow .12s ease;
+    transition: transform .12s ease;
 }
 
+/* Hover effect */
+.st-key-gameboard div[data-testid="stButton"] button:hover {
+    border-color: #a855e8 !important;
+    transform: translateY(-2px);
+}
+
+/* XO symbols */
+.st-key-gameboard div[data-testid="stButton"] button p {
+    font-size: clamp(2rem, 7vw, 3.2rem) !important;
+    font-weight: 900 !important;
+}
+
+
+      
 /* Hover */
 div[data-testid="stButton"] button:hover {
     border-color: #a855e8;
@@ -509,32 +541,34 @@ st.markdown(
 
 # -------------------- Board --------------------
 
-for row in range(3):
+with st.container(key="gameboard"):
 
-    cols = st.columns(3, gap="small")
+    for row in range(3):
 
-    for col in range(3):
+        cols = st.columns(3, gap="small")
 
-        idx = row * 3 + col
+        for col in range(3):
 
-        value = st.session_state.board[idx]
+            idx = row * 3 + col
+
+            value = st.session_state.board[idx]
 
         # Symbol
-        if value == "X":
+            if value == "X":
 
-            label = "✕"
+                label = "✕"
 
-        elif value == "O":
+            elif value == "O":
 
-            label = "◯"
+                label = "◯"
 
-        else:
+            else:
 
-            label = " "
+                label = " "
 
-        with cols[col]:
+            with cols[col]:
 
-            clicked = st.button(
+                clicked = st.button(
                 label,
                 key=f"cell_{idx}",
                 use_container_width=True,
@@ -544,80 +578,35 @@ for row in range(3):
                 )
             )
 
-        if clicked:
+            if clicked:
 
             # -------------------- Human Move --------------------
 
-            st.session_state.board[idx] = "X"
+                st.session_state.board[idx] = "X"
 
-            human_won = winner(
+                human_won = winner(
                 st.session_state.board
             )
 
             # Player wins
-            if human_won:
-
-                st.session_state.game_over = True
-
-                st.session_state.winner = "X"
-
-                st.session_state.scores["X"] += 1
-
-                st.session_state.status = (
-                    "🎉 You won! Amazing move!"
-                )
-
-                st.session_state.celebrated = True
-
-            # Draw
-            elif not available(
-                st.session_state.board
-            ):
-
-                st.session_state.game_over = True
-
-                st.session_state.winner = "Draw"
-
-                st.session_state.scores["Draw"] += 1
-
-                st.session_state.status = (
-                    "🤝 It's a draw! Great game."
-                )
-
-            # -------------------- AI Move --------------------
-
-            else:
-
-                move = ai_move(
-                    st.session_state.board,
-                    difficulty
-                )
-
-                if move is not None:
-
-                    st.session_state.board[move] = "O"
-
-                ai_won = winner(
-                    st.session_state.board
-                )
-
-                # AI wins
-                if ai_won:
+                if human_won:
 
                     st.session_state.game_over = True
 
-                    st.session_state.winner = "O"
+                    st.session_state.winner = "X"
 
-                    st.session_state.scores["O"] += 1
+                    st.session_state.scores["X"] += 1
 
                     st.session_state.status = (
-                        "🤖 AI won this round. Try again!"
-                    )
+                    "🎉 You won! Amazing move!"
+                )
 
-                # Draw after AI move
+                    st.session_state.celebrated = True
+
+            # Draw
                 elif not available(
                     st.session_state.board
-                ):
+            ):
 
                     st.session_state.game_over = True
 
@@ -626,18 +615,63 @@ for row in range(3):
                     st.session_state.scores["Draw"] += 1
 
                     st.session_state.status = (
+                    "🤝 It's a draw! Great game."
+                )
+
+            # -------------------- AI Move --------------------
+
+                 else:
+
+                    move = ai_move(
+                    st.session_state.board,
+                    difficulty
+                )
+
+                  if move is not None:
+
+                      st.session_state.board[move] = "O"
+
+                       ai_won = winner(
+                       st.session_state.board
+                )
+
+                # AI wins
+                    if ai_won:
+
+                        st.session_state.game_over = True
+
+                        st.session_state.winner = "O"
+    
+                        st.session_state.scores["O"] += 1
+
+                        st.session_state.status = (
+                        "🤖 AI won this round. Try again!"
+                    )
+
+                # Draw after AI move
+                    elif not available(
+                        st.session_state.board
+                ):
+
+                        st.session_state.game_over = True
+
+                        st.session_state.winner = "Draw"
+
+                        st.session_state.scores["Draw"] += 1
+
+                        st.session_state.status = (
                         "🤝 It's a draw! Great game."
                     )
 
                 # Continue
-                else:
+                    else:
 
-                    st.session_state.status = (
+                        st.session_state.status = (
                         "🤖 AI played. Your turn!"
                     )
 
             # Refresh board
-            st.rerun()
+                st.rerun()
 
 
 # -------------------- Winner Celebration --------------------
