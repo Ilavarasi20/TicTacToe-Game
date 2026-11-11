@@ -622,56 +622,56 @@ with st.container(key="gameboard"):
 
                  else:
 
-                    move = ai_move(
-                    st.session_state.board,
-                    difficulty
+                     move = ai_move(
+                     st.session_state.board,
+                     difficulty
                 )
 
-                  if move is not None:
+                      if move is not None:
 
-                      st.session_state.board[move] = "O"
+                          st.session_state.board[move] = "O"
 
-                       ai_won = winner(
-                       st.session_state.board
+                           ai_won = winner(
+                           st.session_state.board
                 )
 
                 # AI wins
-                    if ai_won:
+                        if ai_won:
 
-                        st.session_state.game_over = True
+                            st.session_state.game_over = True
 
-                        st.session_state.winner = "O"
+                            st.session_state.winner = "O"
     
-                        st.session_state.scores["O"] += 1
+                            st.session_state.scores["O"] += 1
 
-                        st.session_state.status = (
+                            st.session_state.status = (
                         "🤖 AI won this round. Try again!"
                     )
 
                 # Draw after AI move
-                    elif not available(
-                        st.session_state.board
+                        elif not available(
+                            st.session_state.board
                 ):
 
-                        st.session_state.game_over = True
+                            st.session_state.game_over = True
 
-                        st.session_state.winner = "Draw"
+                            st.session_state.winner = "Draw"
 
-                        st.session_state.scores["Draw"] += 1
+                            st.session_state.scores["Draw"] += 1
 
-                        st.session_state.status = (
+                            st.session_state.status = (
                         "🤝 It's a draw! Great game."
                     )
 
                 # Continue
-                    else:
+                        else:
 
-                        st.session_state.status = (
+                            st.session_state.status = (
                         "🤖 AI played. Your turn!"
                     )
 
             # Refresh board
-                st.rerun()
+                            st.rerun()
 
 
 # -------------------- Winner Celebration --------------------
