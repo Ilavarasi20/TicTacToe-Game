@@ -46,18 +46,51 @@ st.html("""
     background: linear-gradient(135deg, #eadcff, #f9c9e9, #d9c5ff, #ffcce5);
     background-attachment: fixed;
 }
+/* Keep all three board columns in one row */
+.st-key-tic_tac_toe_board [data-testid="stHorizontalBlock"] {
+    display: flex!important;
+    flex-wrap: nowrap !important;
+    justify-content:center !important;
+    gap: 0px !important;
+    column-gap:0px !important;
+    row-gap:0px !important;
+    width:100% !important;
+}
+
+.st-key-tic_tac_toe_board [data-testid="column"] {
+    min-width: 33.333% !important;
+    width:33.333% !important;
+    max-width: 33.333% !important;
+    flex: 0 0 33.333% !important;
+    padding:0 !important;
+    margin:0 !important;
+}
+
+/* Make every XO button square */
+.st-key-tic_tac_toe_board div[data-testid="stButton"] button {
+    width: 100%!important;
+    max-width:85px !important;
+    aspect-ratio: 1 / 1 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    font-size: 30px!important;
+    margin:0 !important;
+}
 .block-container {
-    max-width: 620px;
-    padding-top: 1.8rem;
-    padding-bottom: 2rem;
+    max-width: 350px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
 }
 h1, h2, h3, h4, p, label {
     color: #70258c;
 }
 div[data-testid="stButton"] button {
-    min-height: 88px;
-    height: 88px;
-    border-radius: 14px;
+    min-height: 85px;
+    height: 85px;
+    border-radius: 12px;
     border: 3px solid #bb75d4;
     background: linear-gradient(135deg, #ffffff, #fce3f4);
     color: #852caa;
@@ -88,10 +121,35 @@ div[data-testid="stSelectbox"] > label {
     color: #70258c;
     font-weight: 700;
 }
-@media (max-width: 600px) {
+@media screen and (max-width: 480px) {
+    .st-key-tic_tac_toe_board [data-testid="stHorizontalBlock"] {
+        display:grid !important;
+        grid-template-columns: repeat(3,65px) !important;
+        gap: 8px !important;
+        width:173px !important;
+        max-width:173px !important;
+        justify-content:center !important;
+        margin-left:auto !important;
+        margin-right:auto !important;
+        
+    }
+    .st-key-tic_tac_toe_board [data-testid="column"] {
+        min-width:65px !important;
+        width:65px !important;
+        max-width:65px !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+    .st-key-tic_tac_toe_board div[data-testid="stButton"] button {
+        width: 65px!important;
+        height:65px !important;
+        min-height:55px !important;
+        padding:0 !important;
+        margin:0 auto !important;
+    }
     .block-container {
-        padding-left: 12px;
-        padding-right: 12px;
+        padding-left: 5px !important;
+        padding-right:5px !important;
     }
     div[data-testid="stButton"] button {
         min-height: 74px;
@@ -308,7 +366,7 @@ def human_move(position):
 # APPLICATION TITLE
 # ==========================================
 st.markdown(
-    "<h1 style='text-align:center;color:black;'>🎮 X TIC TAC TOE O 🎮</h1>",
+    "<h1 style='text-align:center;color:black;'><br>X TIC TAC TOE O<br>With AI🤖</h1>",
     unsafe_allow_html=True
 )
 st.markdown(
@@ -369,24 +427,26 @@ st.markdown(
 # ==========================================
 # TIC TAC TOE BOARD - 3 x 3
 # ==========================================
-for row in range(3):
-    columns = st.columns(3, gap="small")
+with st.container(key="tic_tac_toe_board"):
 
-    for col in range(3):
-        position = row * 3 + col
+    for row in range(3):
+        columns = st.columns(3, gap=None)
 
-        with columns[col]:
-            value = st.session_state.board[position]
-            label = value if value else " "
+        for col in range(3):
+            position = row * 3 + col
 
-            if st.button(
-                label,
-                key=f"box_{position}",
-                use_container_width=True,
-                disabled=st.session_state.game_over or value != ""
-            ):
-                human_move(position)
-                st.rerun()
+            with columns[col]:
+                value = st.session_state.board[position]
+                label = value if value else " "
+
+                if st.button(
+                    label,
+                    key=f"box_{position}",
+                    use_container_width=True,
+                    disabled=st.session_state.game_over or value != ""
+                ):
+                    human_move(position)
+                    st.rerun()
 
 # ==========================================
 # WIN CELEBRATION
